@@ -1,4 +1,4 @@
-# ID 92099471
+# ID 92126099
 
 from operator import add, sub, mul, floordiv
 
@@ -11,13 +11,10 @@ class Stack:
         self.__items.append(item)
 
     def pop(self):
-        if not self.is_empty():
+        try:
             return self.__items.pop()
-        else:
+        except IndexError:
             raise IndexError("Стек не содержит элементов")
-
-    def is_empty(self):
-        return len(self.__items) == 0
 
 
 def calculate(elements):
