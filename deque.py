@@ -1,75 +1,77 @@
-# ID 91841749
+# ID 92119092
 
 from typing import List, Optional
 
 
-class CircularDeque:
+class DequeFullError(Exception):
+    pass
+
+
+class DequeEmptyError(Exception):
+    pass
+
+
+class Deque:
     def __init__(self, max_size):
-        self.max_size = max_size
-        self.data: List[Optional[int]] = [None] * max_size
-        self.head = 0
-        self.tail = 0
-        self.size = 0
+        self.__max_size = max_size
+        self.__data: List[Optional[int]] = [None] * max_size
+        self.__head = 0
+        self.__tail = 0
+        self.__size = 0
+
+    def __calculate_index(self, index):
+        return index % self.__max_size
 
     def push_back(self, value):
-        if self.size < self.max_size:
-            self.data[self.tail] = value
-            self.tail = (self.tail + 1) % self.max_size
-            self.size += 1
-        else:
-            return 'error'
+        if self.__size >= self.__max_size:
+            raise DequeFullError('error')
+        self.__data[self.__tail] = value
+        self.__tail = self.__calculate_index(self.__tail + 1)
+        self.__size += 1
 
     def push_front(self, value):
-        if self.size < self.max_size:
-            self.head = (self.head - 1) % self.max_size
-            self.data[self.head] = value
-            self.size += 1
-        else:
-            return 'error'
+        if self.__size >= self.__max_size:
+            raise DequeFullError('error')
+        self.__head = self.__calculate_index(self.__head - 1)
+        self.__data[self.__head] = value
+        self.__size += 1
 
     def pop_front(self):
-        if self.size > 0:
-            value = self.data[self.head]
-            self.head = (self.head + 1) % self.max_size
-            self.size -= 1
-            return value
-        else:
-            return 'error'
+        if self.__size <= 0:
+            raise DequeEmptyError('error')
+        value = self.__data[self.__head]
+        self.__head = self.__calculate_index(self.__head + 1)
+        self.__size -= 1
+        return value
 
     def pop_back(self):
-        if self.size > 0:
-            value = self.data[self.tail - 1]
-            self.tail = (self.tail - 1) % self.max_size
-            self.size -= 1
-            return value
-        else:
-            return 'error'
+        if self.__size <= 0:
+            raise DequeEmptyError('error')
+        value = self.__data[self.__tail - 1]
+        self.__tail = self.__calculate_index(self.__tail - 1)
+        self.__size -= 1
+        return value
 
-n = int(input())
-m = int(input())
-deque = CircularDeque(m)
 
-for _ in range(n):
-    command = input().split()
-    if command[0] == 'push_back':
-        _, value = command
-        result = deque.push_back(int(value))
-        if result == 'error':
-            print("error")
-    elif command[0] == 'push_front':
-        _, value = command
-        result = deque.push_front(int(value))
-        if result == 'error':
-            print('error')
-    elif command[0] == 'pop_front':
-        result = deque.pop_front()
-        if result == 'error':
-            print('error')
-        else:
-            print(result)
-    elif command[0] == 'pop_back':
-        result = deque.pop_back()
-        if result == 'error':
-            print('error')
-        else:
-            print(result)
+def process_commands(deque):
+    results = []
+    for _ in range(number_of_commands):
+        try:
+            command, *params = input().split()
+            result = getattr(deque, command)(*params)
+            if 'pop' in command:
+                results.append(result)
+        except DequeFullError:
+            results.append('error')
+        except DequeEmptyError:
+            results.append('error')
+    return results
+
+
+if __name__ == '__main__':
+    number_of_commands = int(input())
+    max_size = int(input())
+    deque = Deque(max_size)
+    results = process_commands(deque)
+    for result in results:
+        print(result)
