@@ -1,38 +1,44 @@
-# ID 92078053
+# ID 92099471
 
-class Calculator:
+from operator import add, sub, mul, floordiv
+
+
+class Stack:
     def __init__(self):
-        self.items = []
+        self.__items = []
 
     def push(self, item):
-        self.items.append(item)
+        self.__items.append(item)
 
-    def pop(self):    
-        return self.items.pop()    
+    def pop(self):
+        if not self.is_empty():
+            return self.__items.pop()
+        else:
+            raise IndexError("Стек не содержит элементов")
+
+    def is_empty(self):
+        return len(self.__items) == 0
 
 
 def calculate(elements):
-    stack = Calculator()
-    operators = {'+', '-', '*', '/'}
+    stack = Stack()
+    operator_functions = {
+        '+': add, '-': sub,
+        '*': mul, '/': floordiv
+    }
 
     for element in elements:
-        if element not in operators:
+        if element not in operator_functions:
             stack.push(int(element))
         else:
             operand2 = stack.pop()
             operand1 = stack.pop()
-            if element == '+':
-                stack.push(operand1 + operand2)
-            elif element == '-':
-                stack.push(operand1 - operand2)
-            elif element == '*':
-                stack.push(operand1 * operand2)
-            elif element == '/':
-                stack.push(operand1 // operand2)
+            result = operator_functions[element](operand1, operand2)
+            stack.push(result)
 
     return stack.pop()
 
 
-elements = input().split()
-
-print(calculate(elements))
+if __name__ == '__main__':
+    elements = input().split()
+    print(calculate(elements))
